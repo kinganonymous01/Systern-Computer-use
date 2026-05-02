@@ -1,0 +1,6 @@
+{
+  "name": "E2B Desktop AI Agent",
+  "description": "Agent Sandbox that executes user tasks by taking control of a remote Linux workspace. Connects directly via NoVNC iframe for realtime viewing, with agent logging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
