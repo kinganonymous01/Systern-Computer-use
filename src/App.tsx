@@ -66,18 +66,18 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col items-center justify-center min-h-screen max-w-2xl mx-auto p-6"
+            className="flex flex-col items-center justify-center min-h-screen max-w-2xl mx-auto p-4 sm:p-6"
           >
-            <div className="flex items-center gap-3 mb-8 text-indigo-400">
-              <MonitorPlay className="w-12 h-12" />
-              <h1 className="text-4xl font-semibold tracking-tight text-white">Full-Stack AI Agent</h1>
+            <div className="flex flex-col sm:flex-row items-center gap-3 mb-6 sm:mb-8 text-indigo-400 text-center sm:text-left">
+              <MonitorPlay className="w-10 h-10 sm:w-12 sm:h-12 shrink-0" />
+              <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white">Full-Stack AI Agent</h1>
             </div>
             
-            <p className="text-slate-400 mb-8 text-center text-lg leading-relaxed">
+            <p className="text-slate-400 mb-6 sm:mb-8 text-center text-base sm:text-lg leading-relaxed">
               Describe a complex computer task. The AI agent will provision a secure desktop sandbox, open applications, run terminal commands, and perform the actions step-by-step.
             </p>
             
-            <div className="w-full bg-slate-900/50 p-4 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-sm">
+            <div className="w-full bg-slate-900/50 p-3 sm:p-4 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-sm">
               <textarea
                 value={task}
                 onChange={(e) => setTask(e.target.value)}
@@ -89,7 +89,7 @@ export default function App() {
                 <button
                   onClick={handleStart}
                   disabled={!task.trim()}
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-medium transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)]"
+                  className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-medium transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] w-full sm:w-auto"
                 >
                   <Play className="w-5 h-5" fill="currentColor" />
                   Initialize Agent
@@ -104,37 +104,39 @@ export default function App() {
             key="workspace"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="h-screen flex flex-col pt-4 px-6 pb-6"
+            className="h-[100dvh] flex flex-col pt-3 px-3 pb-3 md:pt-4 md:px-6 md:pb-6"
           >
-            <header className="flex justify-between items-center mb-6 shrink-0">
-              <div className="flex items-center gap-4">
+            <header className="flex justify-between items-center mb-4 md:mb-6 shrink-0">
+              <div className="flex items-center gap-3 md:gap-4">
                 <button 
                   onClick={() => setPage('home')}
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
                 >
-                  &larr; Back
+                  &larr; <span className="hidden sm:inline">Back</span>
                 </button>
-                <div className="h-4 w-px bg-slate-800" />
-                <h2 className="text-lg font-medium text-slate-200 flex items-center gap-2">
-                  <span className="relative flex h-3 w-3">
+                <div className="h-4 w-px bg-slate-800 shrink-0" />
+                <h2 className="text-base md:text-lg font-medium text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                  <span className="relative flex h-3 w-3 shrink-0">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
                   </span>
-                  Agent Workspace
+                  <span className="hidden sm:inline">Agent Workspace</span>
+                  <span className="sm:hidden">Workspace</span>
                 </h2>
               </div>
               <button
                 onClick={handleStop}
-                className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium transition-colors border border-red-500/20"
+                className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-2 md:px-4 rounded-lg font-medium transition-colors border border-red-500/20"
               >
                 <Square className="w-4 h-4" />
-                Stop Execution
+                <span className="hidden sm:inline">Stop Execution</span>
+                <span className="sm:hidden">Stop</span>
               </button>
             </header>
 
-            <div className="flex gap-6 h-full min-h-0">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-full min-h-0">
               {/* Screen Viewer Panel */}
-              <div className="flex-[2] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col relative w-full h-full min-h-0">
+              <div className="flex-none h-64 sm:h-80 lg:h-auto lg:flex-[2] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col relative w-full min-h-0">
                 <div className="bg-slate-950 border-b border-slate-800 px-4 py-3 shrink-0 flex items-center justify-between">
                   <div className="flex gap-2">
                     <div className="w-3 h-3 rounded-full bg-slate-800"></div>
@@ -161,7 +163,7 @@ export default function App() {
               </div>
 
               {/* Logs / Terminal Panel */}
-              <div className="flex-1 bg-zinc-950 border border-slate-800 rounded-2xl shadow-2xl flex flex-col min-w-0">
+              <div className="flex-1 bg-zinc-950 border border-slate-800 rounded-2xl shadow-2xl flex flex-col min-h-0 min-w-0">
                 <div className="bg-zinc-900 border-b border-slate-800 px-4 py-3 shrink-0 flex items-center justify-between">
                   <div className="flex items-center gap-2 text-slate-400">
                     <Terminal className="w-4 h-4" />
