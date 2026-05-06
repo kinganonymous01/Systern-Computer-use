@@ -37,6 +37,25 @@ function emitLog(payload: { type: string; message: string }) {
   io.emit('log', payload);
 }
 
+function getExactError(err: any): string {
+  if (typeof err === 'string') return err;
+  let errorDetails = err.message || '';
+  if (err.stack) {
+    errorDetails += `\nStack trace: ${err.stack}`;
+  }
+  if (typeof err === 'object') {
+    try {
+      const extraProps = Object.getOwnPropertyNames(err).filter(p => p !== 'stack' && p !== 'message');
+      if (extraProps.length > 0) {
+        const extraObj: any = {};
+        extraProps.forEach(p => extraObj[p] = err[p]);
+        errorDetails += `\nError details: ${JSON.stringify(extraObj, null, 2)}`;
+      }
+    } catch(e){}
+  }
+  return errorDetails;
+}
+
 const tools = [
   {
     name: 'mouse_move',
@@ -204,7 +223,7 @@ CRITICAL RULES:
               break;
             }
           } catch (e: any) {
-            outputStr = `Error executing tool: ${e.message}`;
+            outputStr = `Error executing tool: ${getExactError(e)}`;
             if (typeof e.stdout === 'string' || typeof e.stderr === 'string') {
               outputStr += `\nStdout: ${e.stdout}\nStderr: ${e.stderr}`;
             }
@@ -220,14 +239,14 @@ CRITICAL RULES:
         });
 
       } catch (err: any) {
-        emitLog({ type: 'error', message: `AI Loop Error: ${err.message}` });
+        emitLog({ type: 'error', message: `AI Loop Error: ${getExactError(err)}` });
         // wait a bit before retrying
         await new Promise(r => setTimeout(r, 2000));
       }
     }
 
   } catch (error: any) {
-    emitLog({ type: 'error', message: `Sandbox Error: ${error.message}` });
+    emitLog({ type: 'error', message: `Sandbox Error: ${getExactError(error)}` });
     isAgentRunning = false;
   }
 }
