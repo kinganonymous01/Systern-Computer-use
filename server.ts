@@ -59,7 +59,7 @@ function getExactError(err: any): string {
 const tools = [
   {
     name: 'mouse_move',
-    description: 'Move the mouse cursor to a specific exact pixel coordinate. Standard screen resolution is 1024x768. Top-left is 0,0. Bottom-right is 1024,768.',
+    description: 'Move the mouse cursor to a specific exact location. EXTREMELY IMPORTANT: Coordinates must be in a 1000x1000 normalized grid (like Gemini 2D Spatial), where top-left is 0,0 and bottom-right is 1000,1000. Examples: Center is 500,500. The system will convert your 1000x1000 coordinates to actual desktop pixel resolution for you.',
     parameters: { type: 'object', properties: { x: { type: 'number' }, y: { type: 'number' } }, required: ['x', 'y'] }
   },
   {
@@ -89,7 +89,7 @@ const tools = [
   },
   {
     name: 'drag_mouse',
-    description: 'Drag the mouse from one coordinate to another.',
+    description: 'Drag the mouse from one coordinate to another. Coordinates must be in a 1000x1000 normalized grid (like Gemini 2D Spatial), where top-left is 0,0 and bottom-right is 1000,1000.',
     parameters: { type: 'object', properties: { x1: { type: 'number' }, y1: { type: 'number' }, x2: { type: 'number' }, y2: { type: 'number' } }, required: ['x1', 'y1', 'x2', 'y2'] }
   },
   {
@@ -125,13 +125,12 @@ async function startAgentLoop(task: string) {
 
 CRITICAL RULES:
 - When using 'execute_command' to start a GUI application (like Google Chrome), you MUST set "background": true. If you do not, the environment will hang forever waiting for the application to close.
-- The desktop resolution is precisely 1024x768 pixels.
-- Top-left corner is X: 0, Y: 0.
-- Bottom-right corner is X: 1024, Y: 768.
-- When using the 'mouse_move' tool:
-  - Estimate the exact pixel location of the UI element you want to interact with.
-  - Do NOT use normalized percentages (e.g. 500, 500). Use the absolute 1024x768 scale.
-  - For example, the middle of the screen is x=512, y=384.` }] },
+- CRITICAL NOTE: The mouse cursor is NOT visible in the screenshots you receive (it's drawn as a hardware overlay). Do NOT look for an arrow pointer to figure out where the mouse is. The system will move the mouse to the location you specify in the mouse_move tool.
+- The desktop resolution is 1024x768 pixels, but for your internal mapping, you MUST use a normalized 1000x1000 grid.
+- Top-left corner is 0, 0. Bottom-right corner is 1000, 1000.
+- When using the 'mouse_move' or 'drag_mouse' tools:
+  - Estimate the exact location using the normalized 1000x1000 grid. (e.g. 500, 500 for center).
+  - DO NOT output 1024x768 based coordinates, always map to exactly 0 to 1000. It is extremely important you use the 1000x1000 map because you have native 2D spatial mapping tokens for that grid scale. The system will internally transform the 1000x1000 to the desktop resolution automatically.` }] },
       { role: 'model', parts: [{ text: "I understand the task and will now begin executing it." }] }
     ];
 
@@ -186,7 +185,9 @@ CRITICAL RULES:
           
           try {
             if (call.name === 'mouse_move') {
-              await activeSandbox.moveMouse(Number(call.args.x), Number(call.args.y));
+              const actualX = Math.round((Number(call.args.x) / 1000) * 1024);
+              const actualY = Math.round((Number(call.args.y) / 1000) * 768);
+              await activeSandbox.moveMouse(actualX, actualY);
             } else if (call.name === 'mouse_click') {
               if (call.args.doubleClick) {
                 await activeSandbox.doubleClick();
@@ -200,7 +201,11 @@ CRITICAL RULES:
             } else if (call.name === 'keyboard_press') {
               await activeSandbox.press(call.args.keys as string[]);
             } else if (call.name === 'drag_mouse') {
-              await activeSandbox.drag([Number(call.args.x1), Number(call.args.y1)], [Number(call.args.x2), Number(call.args.y2)]);
+              const actualX1 = Math.round((Number(call.args.x1) / 1000) * 1024);
+              const actualY1 = Math.round((Number(call.args.y1) / 1000) * 768);
+              const actualX2 = Math.round((Number(call.args.x2) / 1000) * 1024);
+              const actualY2 = Math.round((Number(call.args.y2) / 1000) * 768);
+              await activeSandbox.drag([actualX1, actualY1], [actualX2, actualY2]);
             } else if (call.name === 'execute_command') {
               if (call.args.background) {
                 const cmdRes = await activeSandbox.commands.run(call.args.command as string, { background: true });
